@@ -1,17 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
- Groupe 4
- Céline MOTHES
- Morgan SEGUELA
- V1 : function create_json
- V2 : add function add_to_index, get_hash, already_exists, create_index
- V3 : add function recovery_flux_urss, recovery_article
- V31 : change a variable
- V32 : modification of the recovery_article function
- V33 : modification hash + function create_json
- V34 : deleting date formatting in the create json function
- V40 : Add the function is_empty
-"""
 import csv
 import datetime as date
 import json

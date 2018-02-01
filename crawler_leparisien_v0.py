@@ -2,7 +2,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import requests
 import re
-import g4_utils_v40 as utilsg4
+import utils_v0 as utilsg4
 
 fileTarget = "/Users/sofian/Documents/Projet_att/"
 
