@@ -49,7 +49,7 @@ def tokeniz(text):  # Tokenize a text with library Spacy
     return doc
 
 
-b = tokeniz(clean2Text[0])
+# b = tokeniz(clean2Text[0])
 
 # b[8] renvoie le 8e mot
 
@@ -75,8 +75,6 @@ def handing_entity(tokenize_text):  # Unique named entity version
         ent_und[entity.text.replace(" ", "_")] = entity.label_
     return ent, ent_und
 
-
-entity = handing_entity
 
 # stop_words
 
@@ -148,9 +146,6 @@ def analys_token(article, text_token, entity_, is_title=False):
         return info_without
 
 
-test = analys_token(docs, b, entity, False) # Voir le .keys()
-
-
 def tag_text(article, is_title=False):
     """
         Summary:
@@ -174,7 +169,7 @@ def tag_text(article, is_title=False):
     else:
         text = article["content"]
     # remove punctuation
-    clean_text = clean2Text(text)
+    clean_text = cleanText(text)
     # list of entity and list of entity here " " are replace by "_"
     entity, entity_ = handing_entity(tokeniz(clean_text))
     for keys in entity.keys():
@@ -182,3 +177,6 @@ def tag_text(article, is_title=False):
     tokens = tokeniz(clean_text)
 
     return analys_token(article, tokens, entity_, is_title=is_title)
+
+
+data_post_content, filtered = tag_text(docs, is_title=False)
