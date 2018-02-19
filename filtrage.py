@@ -426,7 +426,8 @@ def analys_token(article, text_token, entity_, is_title=False):
                               "name_newspaper": [x['newspaper'] for x in article],
                               "surname_author": [x['author'] for x in article]
                               }, "position_word": info_without}
-        info_token["words"] = [tkn.text for tkn in text_token]
+        #info_token["words"] = [tkn.text for tkn in text_token]
+        info_token["words"] = [tkn.text for tkn in text_token if tkn.tag != "STOPWORD"] 
         info_token["list_lemma"] = [tkn.lemma_ for tkn in text_token]
         return post_w, info_token
     else:
@@ -466,11 +467,4 @@ def tag_text(article, is_title=False):
     return analys_token(article, tokens, entity_, is_title=is_title)
 
 
-test = tag_text(docs, is_title=True)
-print(test)
-
 data_post_content, filtered = tag_text(docs, is_title=False)
-data_post_title = tag_text(docs, is_title=True)
-data_post_title = list(data_post_title)
-
-ifile = path_target + '/' + str(filtered) + '_filtering.json'
