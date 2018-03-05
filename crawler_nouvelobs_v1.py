@@ -24,30 +24,28 @@ for i in range(1, 30):
                 article_noob.append(h2.a.get("href"))
 
 # analyse de chaque article
-titre =[]
+titre = []
 for url_article in article_noob:
- 
-    try:    
+
+    try:
         soup_article = utils.recovery_flux_url_rss(url_article)
-    
+
         title = soup_article.title.get_text()
         title = title.lower()
 
-   
         find_date = soup_article.find('time', attrs={"class": "date"})
         for a in find_date.find_all('a'):
             find_valeur = re.compile('[0-9]{4}\/[0-9]{2}\/[0-9]{2}')
             for valeur in find_valeur.finditer(str(a.get("href"))):
                 date_p = valeur.group(0)
-                date_p = datetime.strptime(date_p, "%Y/%m/%d")\
-                .strftime("%Y-%m-%d")
+                date_p = datetime.strptime(date_p, "%Y/%m/%d")\.strftime("%Y-%m-%d")
 
         # Retrieval of the author of the article
         author = []
         for div in soup_article.find_all('div'):
             if re.search('author', str(div.get("class"))):
                 author.append(div.p.span.get_text())
-  
+
         # Retrieval of the artical theme
         theme = ""
         for nav in soup_article.find_all('nav'):
@@ -76,13 +74,12 @@ for url_article in article_noob:
                  "author": author,
                  "date_publi": date_p,
                  "theme": theme,
-                 "content": contents
-                    }]
+                 "content": contents}]
 
-        erreur="non"
+        erreur = "non"
         for tit in titre:
             if title == tit:
-                erreur="oui"
+                erreur = "oui"
         if len(contents) > 10 and erreur == "non":
             titre.append(title)
             utils.create_json(file_target, data, "nouvelobs", "noob")

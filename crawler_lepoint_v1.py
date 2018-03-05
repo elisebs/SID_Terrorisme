@@ -68,7 +68,7 @@ def collect_articles(list_dictionaries, list_url_articles):
             if len(content) > 10 and erreur == "non":
                 titre.append(title)
                 list_dictionaries.append(new_article)
-  
+
     except:
         print("Probleme")
 

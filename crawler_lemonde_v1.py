@@ -5,35 +5,35 @@ import utils_v0 as utils
 import time
 
 
-def info_articles(list_dictionaries,list_url_articles): 
+def info_articles(list_dictionaries, list_url_articles):
     try:
         j = 0
-        titre =[]
+        titre = []
         for url_article in list_url_articles:
             soup = utils.recovery_flux_url_rss(url_article)
-         
+
             title = soup.find('title').string
             title = title.lower()
-        
+
             newspaper = "Le Monde"
-             
-            # Article theme 
+
+            # Article theme
             theme = ""
             for li in soup.find_all('li'):
                 for val in re.finditer('ariane', str(li.get("class"))):
                     theme = li.a.get_text()
-            
-            # Author of the article 
+
+            # Author of the article
             if(soup.find("span", class_="auteur")):
                 if(soup.find("span", class_="auteur").a):
-                    author = soup.find("span", class_="auteur").find("a").get_text()
+                    author = soup.find("span",class_="auteur").find("a").get_text()
                 else:
                     author = soup.find("span", class_="auteur").get_text()
                 author = re.sub(r"\s\s+", " ", author)
                 author = re.sub(r"^ ", "", author)
             else:
                 author = ""
-        
+
             # publication date
             date_p = ""
             for tim in soup.find_all('time'):
@@ -41,7 +41,7 @@ def info_articles(list_dictionaries,list_url_articles):
                     date_t = tim.get('datetime')
                     date_p = date_t[0:10]
                     date_p = datetime.strptime(date_p, "%Y-%m-%d").strftime("%d/%m/%Y")
-            
+
             # Article content
             content = ""
             for div in soup.find_all('div'):
@@ -50,21 +50,22 @@ def info_articles(list_dictionaries,list_url_articles):
                         if p.get("class") == ['lire']:
                             p.string = ""
                     content += div.get_text() + " "
-            
-            new_article = utils.recovery_article(title, newspaper, author, date_p, content, theme)
-            
+
+            new_article = utils.recovery_article(title, newspaper, author,
+                                                 date_p, content, theme)
+
             if (j == 3):
                 time.sleep(61)
                 j = 0
-                
-            erreur="non"
+
+            erreur = "non"
             for tit in titre:
                 if title == tit:
-                    erreur="oui"
+                    erreur = "oui"
             if len(content) > 10 and erreur == "non":
                 titre.append(title)
                 list_dictionaries.append(new_article)
-    
+
     except:
         print("Probleme")
 
@@ -72,11 +73,11 @@ def info_articles(list_dictionaries,list_url_articles):
 def recuperation_info_lmde(file_target="/Users/sofian/Documents/Projet_att/" +
                            str(date.datetime.now().date()) + "/"):
 
-    list_url_articles=[]
-    j=0
+    list_url_articles = []
+    j = 0
     # recherche: impact attentat
     for i in range(1, 16):
-        j=j+1
+        j = j+1
         url = 'http://www.lemonde.fr/recherche/?keywords=attentat+impact&page_num=' + str(i) +'&operator=and&exclude_keywords=&qt=recherche_texte_titre&author=&period=since_1944&start_day=01&start_month=01&start_year=1944&end_day=18&end_month=02&end_year=2018&sort=desc'
         soup = utils.recovery_flux_url_rss(url)
 
@@ -90,7 +91,7 @@ def recuperation_info_lmde(file_target="/Users/sofian/Documents/Projet_att/" +
             j = 0
 
     for i in range(1, 600):
-        j=j+1
+        j = j+1
         url = 'http://www.lemonde.fr/recherche/?keywords=attentat&page_num=' + str(i) + "&operator=and&exclude_keywords=&qt=recherche_texte_titre&author=&period=since_1944&start_day=01&start_month=01&start_year=1944&end_day=31&end_month=01&end_year=2018&sort=desc"
         soup = utils.recovery_flux_url_rss(url)
 
@@ -102,9 +103,9 @@ def recuperation_info_lmde(file_target="/Users/sofian/Documents/Projet_att/" +
         if (j == 3):
             time.sleep(61)
             j = 0
-            
+
     for i in range(1, 800):
-        j=j+1
+        j = j+1
         url = 'http://www.lemonde.fr/recherche/?keywords=terrorisme&page_num=' + str(i) + '&operator=and&exclude_keywords=&qt=recherche_texte_titre&author=&period=since_1944&start_day=01&start_month=01&start_year=1944&end_day=18&end_month=02&end_year=2018&sort=desc'
 
         soup = utils.recovery_flux_url_rss(url)
@@ -121,9 +122,9 @@ def recuperation_info_lmde(file_target="/Users/sofian/Documents/Projet_att/" +
     list_dictionaries = []
 
     info_articles(list_dictionaries, list_url_articles)
-    utils.create_json(file_target, list_dictionaries, "LeMonde/",
-                          "lmde")
-            
+    utils.create_json(file_target, list_dictionaries, "LeMonde/", "lmde")
+
+
 if __name__ == '__main__':
     file_target = "/Users/sofian/Documents/Projet_att/" + str(date.datetime.now().date()) + "/"
     recuperation_info_lmde(file_target)
