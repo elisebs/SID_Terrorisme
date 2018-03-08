@@ -8,10 +8,10 @@ fileTarget = "/Users/sofian/Documents/Projet_att/"
 
 
 liste_url = []
-titre =[]
+titre = []
 # Récupération article attentat sur les pages 2 à 35
 for i in range(2, 87):
-    url_crawl = 'http://www.leparisien.fr/actus/attentat/page-' + str(i) 
+    url_crawl = 'http://www.leparisien.fr/actus/attentat/page-' + str(i)
     req2 = requests.get(url_crawl)
     data2 = req2.text
     soup2 = BeautifulSoup(data2, "lxml")
@@ -20,25 +20,25 @@ for i in range(2, 87):
             liste_url.append(a2.get("href"))
 
 for i in range(2, 87):
-    url_crawl = 'http://www.leparisien.fr/actus/terrorisme/page-' + str(i) 
+    url_crawl = 'http://www.leparisien.fr/actus/terrorisme/page-' + str(i)
     req2 = requests.get(url_crawl)
     data2 = req2.text
     soup2 = BeautifulSoup(data2, "lxml")
     for a2 in soup2.find_all('a'):
         for val in re.finditer('article__hover-href', str(a2.get("class"))):
             liste_url.append(a2.get("href"))
-       
+
 for url in liste_url:
     req = requests.get(url)
     data = req.text
     soup_article = BeautifulSoup(data, "lxml")
 
-# Retrieving of title and newspaper
+    # Retrieving of title and newspaper
     balise_title = soup_article.title.string
     sep = balise_title.split(" - ")
     title = sep[0]
 
-        # author
+    # author
     for meta in soup_article.find_all('meta'):
         if meta.get("itemprop") == 'creator':
             author = meta.get("content")
@@ -55,7 +55,7 @@ for url in liste_url:
         if meta.get("itemprop") == 'articleSection':
             categorie = meta.get("content")
 
-# content
+    # content
     content = ""
 
     for h2 in soup_article.find_all('h2'):
@@ -68,20 +68,14 @@ for url in liste_url:
             for a in div.find_all('a'):
                 a.string = ""
             content += div.get_text() + " "
-        
-    
-    data = [{"title": title,
-            "newspaper": "leparisien",
-            "author": author,
-            "date_publi": date_p,
-            "theme": categorie,
-            "content": content
-            }]
+
+    data = [{"title": title, "newspaper": "leparisien", "author": author,
+             "date_publi": date_p, "theme": categorie, "content": content}]
     # Mis sous json les articles
-    erreur="non"
+    erreur = "non"
     for tit in titre:
         if title == tit:
-            erreur="oui"
+            erreur = "oui"
     if len(content) > 10 and erreur == "non":
         titre.append(title)
         utilsg4.create_json(fileTarget, data, "leparisien", "lp")

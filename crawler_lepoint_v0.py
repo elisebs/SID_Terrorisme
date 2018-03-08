@@ -45,7 +45,7 @@ def collect_articles(list_dictionaries, list_url_articles):
         theme = re.search("www.lepoint.fr/(.*)/", url_article)[1]
 		
 		# On va récupéré le contenu de l'article qui est dans une balise <h2 class='art-chapeau'> et aussi dans une balise <div class='art-text">
-		content = ''
+        content = ''
         for h2 in soup.find_all('h2'):
             if h2.get('class') == ['art-chapeau']:
                 content += h2.get_text()+" "
