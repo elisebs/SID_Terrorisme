@@ -23,15 +23,12 @@ stop_words = pickle.load(open('/Users/sofian/Documents/Projet_att/stopwords.p', 
 # chemin où les dossiers filtrés seront mis
 path_target = '/Users/sofian/Documents/Projet_att/path_target/'
 
-
-
 # cleanText
 
 '''
 La fonction cleanTokens permet de nettoyer l'article c'est-a-dire d'enlever
 toute la ponctuation
 '''
-
 
 def clean_symbols(text):
     """
@@ -332,18 +329,17 @@ def text_modif(content):
         matches_list = reg_ex_thirteen.findall(content)
         for matche in matches_list:
             content = re.sub(matche, matche.replace('deg', ' '), content)
+
     except BaseException:
         print("Deg stuff didn't work this time...")
 
     return content
-
 
 # tokenize
 
 '''
 La fonction tokenize va permettre d'obtenir chaque mot separer.
 '''
-
 
 def tokeniz(text):  # Tokenize a text with library Spacy
     doc = nlp(text)
@@ -377,7 +373,7 @@ def handing_entity(tokenize_text):  # Unique named entity version
     return ent, ent_und
 
 
-def analys_token(article, text_token, entity_,newspapers,identi_article):
+def analys_token(article, text_token, entity_,newspapers,identi_article,date_p):
     """
         Summary:
             This function creates the dictionnary.
@@ -398,7 +394,7 @@ def analys_token(article, text_token, entity_,newspapers,identi_article):
     """
     # ici en sortie on aura un dico avec le mot, sa lemmatisation, le pos_tag,
     #la position et si c'est un truc VRAI/FAUX
-    
+
     info_token = {}
     i = 1
     for token in text_token:
@@ -416,19 +412,20 @@ def analys_token(article, text_token, entity_,newspapers,identi_article):
             #"type_entity": entity_[str(token)]
             #if str(token) in entity_.keys()
            # else "",
-            "position": i
+            "position": i,
+            "date_publication":date_p
             #"title": (
             #    set(str(token.text).upper().replace("_",
             #        " ").split()).issubset(str([x['title'] for x in article]).upper(
             #                ).split(" ")))
         }
         i += 1 
-    
+
     #info_without prend les infos du info_token en retirant les stop_words et les ponctuations
     info_without = [token for token in info_token.values() if str(
         token["pos_tag"]) != "STOPWORD" and token["word"] != '.' and str(token["pos_tag"]) != "PUNCT"]
-    
-    
+
+
     #ICI, je prend juste la lemma pour obtenir une liste de mot. (correspond à la table WORD)
     #sans id, car je crois que c'est en auto_increment
     #ici on récupére juste la lemma sans les stopwords
@@ -436,11 +433,11 @@ def analys_token(article, text_token, entity_,newspapers,identi_article):
     #for token in text_token:
     #    if token.text not in stop_words and token.text != '.':
     #        list_word.append(token.lemma_)
-       
+
     return info_without
 
 
-def tag_text(article):
+def tag_text(article,k):
     """
         Summary:
         In:
@@ -460,7 +457,8 @@ def tag_text(article):
     """
     text = [x['content'] for x in article]
     journal = [x['newspaper'] for x in article]
-    id_article = [x['id_art'] for x in article]
+    id_article = k
+    date_publication=[x['date_publi'] for x in article]
     # remove punctuation
     clean_text = clean_symbols(str(text))
     # list of entity and list of entity here " " are replace by "_"
@@ -469,10 +467,9 @@ def tag_text(article):
         clean_text = clean_text.replace(keys, keys.replace(" ", "_"))
     tokens = tokeniz(clean_text)
 
-    id_article = "".join(id_article) # car l'id etait en list, je l'ai mis en str
-    journal = "".join(journal) # idemn avec journal
-    
-    return analys_token(article, tokens, entity_,journal,id_article)
+    journal = "".join(journal) # idemn le journal etait en list, je l'ai mis en str
+
+    return analys_token(article, tokens, entity_,journal,id_article,date_publication)
 
 
 #Le problème ici, c'est que file devrait prendre tous les articles de list_file
@@ -482,7 +479,7 @@ def tag_text(article):
 #gérer ce que l'on souhaite dans la fonction analys_token : pour l'instant on
 #à la sortie qui correspond à la table WORD c'est-à-dire une liste de mot pour chaque
 #article du journal le monde.
-    
+
 path_target_lmnde="/Users/sofian/Documents/Projet_att/article_total"
 
 list_file = os.listdir(path_target_lmnde)
@@ -491,22 +488,21 @@ list_file = os.listdir(path_target_lmnde)
 data_post_content = []
 c = csv.writer(open(path_target + "article_filtered.csv", "w"))
 
-i=0
-j=0
+i = 0
+j = 0
 for file in list_file :
-    i=i+1
-    j=j+1
-    f = open(path_target_lmnde+ '/' + file,'rb')
+    i = i+1
+    j = j+1
+    f = open(path_target_lmnde + '/' + list_file[1], 'rb')
     articles = [json.loads(s.decode('utf-8')) for s in f.readlines()]
-    data_post_content.append(tag_text(articles))
+    data_post_content.append(tag_text(articles,i))
     if j == 50:
-            j=0
+            j = 0
             print(i)
 
-data_final=[] 
+data_final = [] 
 for sublist in data_post_content: ## pour mettre en list de dictonnaire au lieu de list de list
     for item in sublist:
         data_final.append(item)
-  
+
 c.writerow(data_final)
-    
