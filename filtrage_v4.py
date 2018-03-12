@@ -1,33 +1,28 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Feb  2 10:11:43 2018
-
-@author: Elise Benois & Sibylle de Gerin-Ricard
+Nettoyage des données
 """
 
 import re
 import json
 import spacy
-from spacy.lemmatizer import Lemmatizer
 import pickle
 nlp = spacy.load('fr')
-from tqdm import tqdm
 import csv
 import os
 
+# Ici, on charge une liste de stopwords : 
 stop_words = pickle.load(open('/Users/sofian/Documents/Projet_att/stopwords.p', 'rb'))
 
-# Enlever les articles où il y a marqué en direct
-#articles = [json.loads(s.decode('utf-8')) for s in f.readlines()]
-
-# chemin où les dossiers filtrés seront mis
+#chemin où les articles filtrés seront mis
 path_target = '/Users/sofian/Documents/Projet_att/path_target/'
 
 # cleanText
 
 '''
-La fonction cleanTokens permet de nettoyer l'article c'est-a-dire d'enlever
-toute la ponctuation
+La fonction clean_symbols permet de nettoyer l'article c'est-a-dire d'enlever
+toute la ponctuation, les accents, de remplacer les apostrophes par des blancs
+ou bien supprimer des symboles.
 '''
 
 def clean_symbols(text):
@@ -347,11 +342,9 @@ def tokeniz(text):  # Tokenize a text with library Spacy
 
 
 # b = tokeniz(clean_symbols[0])
-
 # b[8] renvoie le 8e mot
 
 # Entites nommes
-
 
 def handing_entity(tokenize_text):  # Unique named entity version
     """
@@ -375,26 +368,19 @@ def handing_entity(tokenize_text):  # Unique named entity version
 
 def analys_token(article, text_token, entity_,newspapers,identi_article,date_p):
     """
-        Summary:
-            This function creates the dictionnary.
-            Requires global variable "stop_words"
-        In:
-            - text_token: list of tokenized word
-            - entity_: list of named entities, whitespaces are underscores
-            - is_title: boolean:
-                    * 'True' if text_token contains the title,
-                    * 'False' if it's the actual article content.
-        Out:
-            - info_token : a dictionnary:
-                each compartiment is a dictionnary which contains informations
-                for each words
-            - post_w : info_token minus the stopwords
-            - info_without : processed title without stopwords
+        Résumé : 
+            cette fonction permet de créer un dictionnaire regroupant l'id de 
+            l'article, le nom du journal, le mot, le mot lemmatise, le pos_tag 
+            du mot, sa position et sa date de publication.
+        En entrée : 
+            - l'article
+            - text_token : liste de mot tokenise
+            - entity : liste de entités nommées
+        En sortie : 
+            cette fonction renvoie les informations décrites dans le résumé.
     
     """
-    # ici en sortie on aura un dico avec le mot, sa lemmatisation, le pos_tag,
-    #la position et si c'est un truc VRAI/FAUX
-
+    
     info_token = {}
     i = 1
     for token in text_token:
@@ -424,15 +410,6 @@ def analys_token(article, text_token, entity_,newspapers,identi_article,date_p):
     #info_without prend les infos du info_token en retirant les stop_words et les ponctuations
     info_without = [token for token in info_token.values() if str(
         token["pos_tag"]) != "STOPWORD" and token["word"] != '.' and str(token["pos_tag"]) != "PUNCT"]
-
-
-    #ICI, je prend juste la lemma pour obtenir une liste de mot. (correspond à la table WORD)
-    #sans id, car je crois que c'est en auto_increment
-    #ici on récupére juste la lemma sans les stopwords
-    #list_word = []
-    #for token in text_token:
-    #    if token.text not in stop_words and token.text != '.':
-    #        list_word.append(token.lemma_)
 
     return info_without
 
@@ -472,21 +449,22 @@ def tag_text(article,k):
     return analys_token(article, tokens, entity_,journal,id_article,date_publication)
 
 
-#Le problème ici, c'est que file devrait prendre tous les articles de list_file
-#sauf qu'on reste toujours sur le meme article... Pourtant que je fais print la boucle
-#fonctionne.
-#Ensuite, si tu veux faire une sortie par table comme on avait discuté, il faudra
-#gérer ce que l'on souhaite dans la fonction analys_token : pour l'instant on
-#à la sortie qui correspond à la table WORD c'est-à-dire une liste de mot pour chaque
-#article du journal le monde.
-
 path_target_lmnde="/Users/sofian/Documents/Projet_att/article_total"
 
 list_file = os.listdir(path_target_lmnde)
 #del list_file[0] # supprime le '.DS_Store'
 
+# Creation d'une liste pour permettre d'executer les fonctions
 data_post_content = []
+
+# Creation d'un csv dans lequel nous mettons les articles filtres
 c = csv.writer(open(path_target + "article_filtered.csv", "w"))
+
+'''
+    nous parcourons chaque article pour pouvoir les nettoyer. Ensuite, les 
+    articles sont inséré dans le csv pour pouvoir par la suite les inserer dans
+    la base de donnees.
+'''
 
 i = 0
 j = 0
@@ -501,7 +479,7 @@ for file in list_file :
             print(i)
 
 data_final = [] 
-for sublist in data_post_content: ## pour mettre en list de dictonnaire au lieu de list de list
+for sublist in data_post_content: # pour mettre en list de dictonnaire au lieu de list de list
     for item in sublist:
         data_final.append(item)
 
