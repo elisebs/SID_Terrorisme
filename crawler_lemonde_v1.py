@@ -4,7 +4,13 @@ import re
 import utils_v0 as utils
 import time
 
-
+'''
+Fonction qui prend en paramètre :
+    une liste de dictionnaire + la liste des urls des articles
+Cette fonction va pour chaque article récupérer:
+    le thème, le titre, l'autheur, 
+    la date de publication et le contenu de l'article
+'''
 def info_articles(list_dictionaries, list_url_articles):
     try:
         j = 0
@@ -70,12 +76,20 @@ def info_articles(list_dictionaries, list_url_articles):
         print("Probleme")
 
 
+'''
+Fonction qui prend en paramètre :
+    le chemin du dossier dans lequel fichier article sera mis
+Cette fonction va récupérer les urls de chaque article qui parle d'attentat, 
+terrorisme, impact attentat. Puis qui va faire appel à la fonction info_articles
+pour récupérer le contenu, le titre etc..
+puis après avoir récupérer les informations de chaque article, on les mets en json
+'''
 def recuperation_info_lmde(file_target="/Users/sofian/Documents/Projet_att/" +
                            str(date.datetime.now().date()) + "/"):
 
     list_url_articles = []
     j = 0
-    # recherche: impact attentat
+    # récupération des articles avec la recherche: impact attentat
     for i in range(1, 16):
         j = j+1
         url = 'http://www.lemonde.fr/recherche/?keywords=attentat+impact&page_num=' + str(i) +'&operator=and&exclude_keywords=&qt=recherche_texte_titre&author=&period=since_1944&start_day=01&start_month=01&start_year=1944&end_day=18&end_month=02&end_year=2018&sort=desc'
@@ -90,6 +104,7 @@ def recuperation_info_lmde(file_target="/Users/sofian/Documents/Projet_att/" +
             time.sleep(61)
             j = 0
 
+    # récupération des articles avec la recherche: attentat
     for i in range(1, 600):
         j = j+1
         url = 'http://www.lemonde.fr/recherche/?keywords=attentat&page_num=' + str(i) + "&operator=and&exclude_keywords=&qt=recherche_texte_titre&author=&period=since_1944&start_day=01&start_month=01&start_year=1944&end_day=31&end_month=01&end_year=2018&sort=desc"
@@ -104,6 +119,7 @@ def recuperation_info_lmde(file_target="/Users/sofian/Documents/Projet_att/" +
             time.sleep(61)
             j = 0
 
+    # récupération des articles avec la recherche: terrorisme
     for i in range(1, 800):
         j = j+1
         url = 'http://www.lemonde.fr/recherche/?keywords=terrorisme&page_num=' + str(i) + '&operator=and&exclude_keywords=&qt=recherche_texte_titre&author=&period=since_1944&start_day=01&start_month=01&start_year=1944&end_day=18&end_month=02&end_year=2018&sort=desc'
