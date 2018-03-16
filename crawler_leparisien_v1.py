@@ -9,7 +9,7 @@ fileTarget = "/Users/sofian/Documents/Projet_att/"
 
 liste_url = []
 titre = []
-# Récupération article attentat sur les pages 2 à 35
+# Récupération url des articles avec la barre de recherche: attentat
 for i in range(2, 87):
     url_crawl = 'http://www.leparisien.fr/actus/attentat/page-' + str(i)
     req2 = requests.get(url_crawl)
@@ -19,6 +19,7 @@ for i in range(2, 87):
         for val in re.finditer('article__hover-href', str(a2.get("class"))):
             liste_url.append(a2.get("href"))
 
+# Récupération url des articles avec la barre de recherche: terrorisme
 for i in range(2, 87):
     url_crawl = 'http://www.leparisien.fr/actus/terrorisme/page-' + str(i)
     req2 = requests.get(url_crawl)
@@ -28,6 +29,8 @@ for i in range(2, 87):
         for val in re.finditer('article__hover-href', str(a2.get("class"))):
             liste_url.append(a2.get("href"))
 
+## Boucle pour récupérer les informations de chaque article:
+#       titre, contenu, autheur, date publication, theme
 for url in liste_url:
     req = requests.get(url)
     data = req.text
