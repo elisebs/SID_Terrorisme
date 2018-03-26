@@ -1,47 +1,44 @@
-import spacy
- import pickle
- nlp = spacy.load('fr')
-+from tqdm import tqdm
-+
- #stop_words = pickle.load(open('/var/www/html/projet2018/code/filtering/' + 'functions/stopwords.p', 'rb'))
- stop_words = pickle.load(open('/Users/Elise/SID_Terrorisme/stopwords.p', 'rb'))
+import pickle
+nlp = spacy.load('fr')
+from tqdm import tqdm
+import csv
 
-@@ -464,3 +466,38 @@ def tag_text(article, is_title=False):
 
- test = tag_text(docs, is_title=False)
- print(test)
-+
-+with tqdm(desc='JSONing', total=len(docs)) as pbar:
-+    tableau_vide = []
-+    for item in docs:
-+        art = docs[item]
-+        data_post_content, filtered = tag_text(art, isTitle=False)
-+
-+        data_post_title = tag_text(art, isTitle=True)
-+        data_post_title = list(data_post_title)
-+        for dic in range(len(data_post_title)):
-+            data_post_content["position_word"].append(data_post_title[dic])
-+        data_post_content["id_art"] = art["id_art"]
-+        data_post = []
-+        data_post.append(data_post_content)
-+#        data_post = json.dumps(data_post, ensure_ascii='False')
-+#        print('POST filtering en cours ...')
-+#        log_post_filt = post_filtering(data_post)
-+#        id_article = log_post_filt.json()[0][0]["message"]["id_article"]
-+        ifile = path_post_filt_target + '/' + item + '_post_filtered.json'
-+        with open(ifile, 'w', encoding='utf-8') as outfile:
-+            json.dump(data_post, outfile, ensure_ascii=False)
-+
-+        tfidf = get_tf_idf(filtered['list_lemma'], art["id_art"])
-+#        tfidf = json.dumps(tfidf, ensure_ascii='False')
-+#        print('POST TF en cours ...')
-+#        log_post_tf = post_tfidf(tfidf)
-+#        print('POST TF OK')
-+#        print('log_post_tf = '+str(log_post_tf))
-+        ifile = path_post_tf_target + '/' + item + '_post_tf.json'
-+        with open(ifile, 'w', encoding='utf-8') as outfile:
-+            json.dump(tfidf, outfile, ensure_ascii=False)
-+        pbar.update()
-+
-+import spacy
-+x=spacy.load('en')
+ path_target = '/Users/Elise/SID_Terrorisme/path_target'
+
+def analys_token(article, text_token, entity_, is_title=False):
+              post_w : info_token minus the stopwords
+              info_without : processed title without stopwords
+    info_token = {}
+    i = 1
+    list_word = []
+     for token in text_token:
+        if token.text in stop_words:
+            tag = "STOPWORD"
+        else:
+            tag = token.pos_
+
+        info_token[i] = {
+            "word": token.text,
+            "lemma": token.lemma_,
+            "pos_tag": tag,
+            "type_entity": entity_[str(token)]
+            if str(token) in entity_.keys()
+            else "",
+            "position": i,
+            "title": (
+                set(str(token.text).upper().replace("_",
+                    " ").split()).issubset(str([x['title'] for x in article]).upper(
+                            ).split(" ")))
+        }
+        i = 1
+
+    info_without = [token for token in info_token.values() if str(
+        token["pos_tag"]) != "STOPWORD" and token["word"] != '.']
+
+
+    return info_without
+        if token.text not in stop_words and token.text != '.':
+            list_word.append(token.lemma_)
+
+    return list_word
