@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Jan 12 14:29:50 2018
-
-@author: Elise
+Création d'une liste de stopwords
 """
 import spacy
 import json
@@ -15,15 +12,18 @@ from nltk.corpus import stopwords
 nltk.download('stopwords')
 
 
+# Création d'une fonction pour tokeniser avec nltk
 def tokeniz(article):
     nlp = spacy.load('fr')
     doc = nlp(article)
     return doc
 
 
+# Création d'une liste vide de list_stopwords
 list_stopwords = []
 
 
+# Création d'une fonction get_stopwords()
 def get_stopwords():
 
     for find_stopwords in b:
@@ -39,6 +39,8 @@ def get_stopwords():
     return list_stopwords
 
 
+# Je charge des articles avec lesquelles j'applique les fonctions pour ensuite
+# obtenir une liste de stopwords
 path = '/Users/Elise/Documents/Travail/M1_SID/SID_Terrorisme/test/'
 for i in os.listdir(path):
     if i != '.DS_Store':
@@ -64,14 +66,17 @@ list_stop_words = np.unique(list_stop_words)
 stop_words = get_stopwords()
 
 
+# création d'une liste lettre avec toutes les lettres de l'alphabet
 lettre = ['a', 'z', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'q', 's', 'd', 'f',
           'g', 'h', 'j', 'k', 'l', 'm', 'w', 'x', 'c', 'v', 'b', 'n']
 
+# j'ajoute à la liste des stopwords toutes les lettres de l'alphabet
 for i in lettre:
     list_stop_words.append(i)
 
 list_stop_words = np.unique(list_stop_words)
 
+# liste de mots qu'on rajoute aux stopwords
 list_stop_words = ['are', 'also', 'a', 'ai', 'aie', 'aient', 'aies',
                    'ailleurs', 'ainsi', 'ait', 'alors', 'après', 'as', 'assez',
                    'au', "ajourd'hui", 'aucun', 'aucune', 'aura', 'aurai',
@@ -123,6 +128,7 @@ list_stop_words = ['are', 'also', 'a', 'ai', 'aie', 'aient', 'aies',
                    'g', 'h', 'j', 'k', 'l', 'm', 'w', 'x', 'c', 'v', 'b',
                    'n']
 
+# création d'un fichier pickle dans lequel on retrouve TOUS les stopwords
 with open('stopwords.p', 'wb') as fichier:
     mon_pickler = pickle.Pickler(fichier)
     mon_pickler.dump(list_stop_words)
@@ -136,6 +142,7 @@ stop_words = pickle.load(open('/Users/Elise/Documents/Travail/M1_SID/SID_Terrori
 np.unique(stop_words)
 
 
+# calcule du tf pour avoir l'occurence des mots
 def tf(articles):
     a = []
     for i in range(len(articles)):
