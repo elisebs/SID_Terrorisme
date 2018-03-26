@@ -1,21 +1,8 @@
-""
-author:Raphael
-""
-
- 
-#Installation des packages et chargement des librairies
-install.packages("rgdal")
-install.packages("plotrix")
-install.packages("classInt")
-install.packages("cartography")
-
+# Installation des packages et chargement des librairies
 library(rgdal)
 library(plotrix)
 library(classInt)
 library(cartography)
-
-
-
 
 # Lecture des fichiers shapefiles
 pays   <- readOGR(dsn="C:/Users/cmisid/Documents/TableauDeBord/graphique/maps/cultural",layer="ne_110m_admin_0_countries")
@@ -27,7 +14,7 @@ pays   <- spTransform(pays,CRS("+proj=wintri"))
 boite  <- spTransform(boite,  CRS("+proj=wintri"))
 grille <- spTransform(grille, CRS("+proj=wintri"))
 
-# Tracé du planisphère
+# Trac? du planisph?re
 pdf('C:/Users/cmisid/Documents/TableauDeBord/graphique/monde.pdf',width=10,height=6) # Exportation en PDF
 par(mar=c(0,0,0,0)) # Marges nulles
 
@@ -49,26 +36,24 @@ vec=c(0.022, 0.000, NA,    0.000, NA,    NA,    NA, NA,    0.025, 0.003, 0.000, 
       0.001, NA,    0.001, 0.003, 0.000, 0.006, 0.000, NA,    NA)
 
 
-
-
 path = "C:/Users/cmisid/Documents/TableauDeBord/graphique/hdi.csv"
-idh = read.csv(path) #données dans la quelle on va inclure le vecteur vec
+idh = read.csv(path) #donn?es dans la quelle on va inclure le vecteur vec
 pays <- merge(pays, idh, by.x="ISO_A3", by.y="Abbreviation")
 pays$idh <- 1000*vec
 
-# Génération de l'échelle de couleurs et affectation
+# Generation de l'?chelle de couleurs et affectation
 col <- findColours(classIntervals(pays$idh, 100, style="pretty"),
                    smoothColors("#663b54",98,"#9b0711"))
 
-# Affectation d'un gris clair pour les données manquantes
+# Affectation d'un gris clair pour les donn?es manquantes
 col[is.na(pays$idh)] <- "#DDDDDD"
 
-# Génération de la légende
+# Generation de la l?gende
 leg <- findColours(classIntervals(round(pays$idh,3), 7, style="pretty"),
                    smoothColors("#663b54",5,"#9b0711"),
                    under="moins de %", over="plus de %", between="-", cutlabels=FALSE)
 
-# Tracé
+# Trace
 cairo_pdf('CARTE.pdf',width=10,height=6)
 par(mar=c(0,0,0,0),family="Myriad Pro",ps=8)
 
@@ -80,16 +65,3 @@ legend(-15000000,-3000000,fill=attr(leg, "palette"),
        legend=gsub("\\.", ",", names(attr(leg,"table"))),
        title = "TERRORISME&ATTENTAT/SID2018")
 dev.off()
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -18,7 +18,7 @@ nuts0.df$attentat=c(166,0,83,928,60,24,2853,151,15,1615,95,17745,0,24,43,135,18,
 # proportionnels
 propSymbolsLayer(spdf = nuts0.spdf, df = nuts0.df, 
                  var = "attentat", symbols = "circle", col = "#920000", 
-                 legend.pos = "right", legend.title.txt = "Total\nattentats", 
+                 legend.pos = "topright", legend.title.txt = "Nombre d'occurences \n des pays européens ", 
                  legend.style = "c")
 
 # Ajout des titres, légende, sources, etc.
