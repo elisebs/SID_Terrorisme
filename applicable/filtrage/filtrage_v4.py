@@ -11,31 +11,20 @@ nlp = spacy.load('fr')
 import csv
 import os
 
-# Ici, on charge une liste de stopwords : 
+# Ici, on charge une liste de stopwords :
 stop_words = pickle.load(open('/Users/sofian/Documents/Projet_att/stopwords.p', 'rb'))
 
-#chemin où les articles filtrés seront mis
+# chemin où les articles filtrés seront mis
 path_target = '/Users/sofian/Documents/Projet_att/path_target/'
 
-# cleanText
-
-'''
-La fonction clean_symbols permet de nettoyer l'article c'est-a-dire d'enlever
-toute la ponctuation, les accents, de remplacer les apostrophes par des blancs
-ou bien supprimer des symboles.
-'''
 
 def clean_symbols(text):
-    """
-        Summary:
-            This functions clean the function in order to make a tokenization
-            without punctuation.
-            Only the sentence-ending punctuations is kept as a point.
-        In:
-            - text: actual content of the article
-        Out:
-            - art: cleaned text.
-    """
+
+    '''
+        La fonction clean_symbols permet de nettoyer l'article c'est-a-dire
+        d'enlever toute la ponctuation, les accents, de remplacer les
+        apostrophes par des blancsou bien supprimer des symboles.
+    '''
 
     art = text_modif(text)
     # Replace sentence ending punctuation by full-stop
@@ -50,15 +39,12 @@ def clean_symbols(text):
     art = art.replace(')', '')
     art = art.replace('<', '')
     art = art.replace('>', '')
-    
     # Replace accent
     art = art.replace('é', 'e')
     art = art.replace('è', 'e')
     art = art.replace('à', 'a')
     art = art.replace('ç', 'c')
     art = art.replace('œ', 'oe')
-
-
     # Replace apostrophes by blanks
     art = re.sub(r'’', ' ', art)
     art = art.replace('\n', '')
@@ -330,23 +316,17 @@ def text_modif(content):
 
     return content
 
-# tokenize
 
-'''
-La fonction tokenize va permettre d'obtenir chaque mot separer.
-'''
-
-def tokeniz(text):  # Tokenize a text with library Spacy
+def tokeniz(text):
+    '''
+        La fonction tokenize va permettre d'obtenir chaque mot separer.
+    '''
     doc = nlp(text)
     return doc
 
 
-# b = tokeniz(clean_symbols[0])
-# b[8] renvoie le 8e mot
-
 # Entites nommes
-
-def handing_entity(tokenize_text):  # Unique named entity version
+def handing_entity(tokenize_text):
     """
         Summary:
             we go through a tokenize text (result of the function "tokenize"),
@@ -368,19 +348,18 @@ def handing_entity(tokenize_text):  # Unique named entity version
 
 def analys_token(article, text_token, entity_,newspapers,identi_article,date_p):
     """
-        Résumé : 
-            cette fonction permet de créer un dictionnaire regroupant l'id de 
-            l'article, le nom du journal, le mot, le mot lemmatise, le pos_tag 
+        Résumé :
+            cette fonction permet de créer un dictionnaire regroupant l'id de
+            l'article, le nom du journal, le mot, le mot lemmatise, le pos_tag
             du mot, sa position et sa date de publication.
-        En entrée : 
+        En entrée :
             - l'article
             - text_token : liste de mot tokenise
             - entity : liste de entités nommées
-        En sortie : 
+        En sortie :
             cette fonction renvoie les informations décrites dans le résumé.
-    
     """
-    
+
     info_token = {}
     i = 1
     for token in text_token:
@@ -395,26 +374,21 @@ def analys_token(article, text_token, entity_,newspapers,identi_article,date_p):
             "word": token.text,
             "lemma": token.lemma_,
             "pos_tag": tag,
-            #"type_entity": entity_[str(token)]
-            #if str(token) in entity_.keys()
-           # else "",
             "position": i,
-            "date_publication":date_p
-            #"title": (
-            #    set(str(token.text).upper().replace("_",
-            #        " ").split()).issubset(str([x['title'] for x in article]).upper(
-            #                ).split(" ")))
+            "date_publication": date_p
         }
-        i += 1 
+        i += 1
 
-    #info_without prend les infos du info_token en retirant les stop_words et les ponctuations
+    # info_without prend les infos du info_token en retirant
+    # les stop_words et les ponctuations
     info_without = [token for token in info_token.values() if str(
-        token["pos_tag"]) != "STOPWORD" and token["word"] != '.' and str(token["pos_tag"]) != "PUNCT"]
+        token["pos_tag"]) != "STOPWORD" and token["word"] != '.'
+        and str(token["pos_tag"]) != "PUNCT"]
 
     return info_without
 
 
-def tag_text(article,k):
+def tag_text(article, k):
     """
         Summary:
         In:
@@ -435,7 +409,7 @@ def tag_text(article,k):
     text = [x['content'] for x in article]
     journal = [x['newspaper'] for x in article]
     id_article = k
-    date_publication=[x['date_publi'] for x in article]
+    date_publication = [x['date_publi'] for x in article]
     # remove punctuation
     clean_text = clean_symbols(str(text))
     # list of entity and list of entity here " " are replace by "_"
@@ -444,15 +418,17 @@ def tag_text(article,k):
         clean_text = clean_text.replace(keys, keys.replace(" ", "_"))
     tokens = tokeniz(clean_text)
 
-    journal = "".join(journal) # idemn le journal etait en list, je l'ai mis en str
+    # idemn le journal etait en list, mis en str
+    journal = "".join(journal)
 
-    return analys_token(article, tokens, entity_,journal,id_article,date_publication)
+    return analys_token(article, tokens, entity_, journal,
+                        id_article, date_publication)
 
 
-path_target_lmnde="/Users/sofian/Documents/Projet_att/article_total"
+path_target_lmnde = "/Users/sofian/Documents/Projet_att/article_total"
 
 list_file = os.listdir(path_target_lmnde)
-#del list_file[0] # supprime le '.DS_Store'
+# del list_file[0] # supprime le '.DS_Store'
 
 # Creation d'une liste pour permettre d'executer les fonctions
 data_post_content = []
@@ -461,25 +437,26 @@ data_post_content = []
 c = csv.writer(open(path_target + "article_filtered.csv", "w"))
 
 '''
-    nous parcourons chaque article pour pouvoir les nettoyer. Ensuite, les 
+    Nous parcourons chaque article pour pouvoir les nettoyer. Ensuite, les
     articles sont inséré dans le csv pour pouvoir par la suite les inserer dans
     la base de donnees.
 '''
 
 i = 0
 j = 0
-for file in list_file :
+for file in list_file:
     i = i+1
     j = j+1
     f = open(path_target_lmnde + '/' + list_file[1], 'rb')
     articles = [json.loads(s.decode('utf-8')) for s in f.readlines()]
-    data_post_content.append(tag_text(articles,i))
+    data_post_content.append(tag_text(articles, i))
     if j == 50:
             j = 0
             print(i)
 
-data_final = [] 
-for sublist in data_post_content: # pour mettre en list de dictonnaire au lieu de list de list
+data_final = []
+# pour mettre en list de dictonnaire au lieu de list de list
+for sublist in data_post_content:
     for item in sublist:
         data_final.append(item)
 
