@@ -80,7 +80,6 @@ def recovery_new_articles_lpt(
                 list_url_articles.append(url)
 
 
-######################
         url2 = 'http://www.lesoir.be/archives/recherche?datefilter=lastyear&sort=date+desc&start='
         + str(i) + '&word=attentat'
         soup2 = utils.recovery_flux_url_rss(url2)
