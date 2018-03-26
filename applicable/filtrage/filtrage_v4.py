@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Nettoyage des données
+NETTOYAGE DES DONNÉES
 """
 
 import re
@@ -14,7 +14,7 @@ import os
 # Ici, on charge une liste de stopwords :
 stop_words = pickle.load(open('/Users/sofian/Documents/Projet_att/stopwords.p', 'rb'))
 
-# chemin où les articles filtrés seront mis
+# Chemin où les articles filtrés seront mis
 path_target = '/Users/sofian/Documents/Projet_att/path_target/'
 
 
@@ -27,7 +27,7 @@ def clean_symbols(text):
     '''
 
     art = text_modif(text)
-    # Replace sentence ending punctuation by full-stop
+    # Remplace la ponctuation par des escpaces ou des points
     art = art.replace('?', '.')
     art = art.replace('!', '.')
     art = art.replace('...', '.')
@@ -39,37 +39,36 @@ def clean_symbols(text):
     art = art.replace(')', '')
     art = art.replace('<', '')
     art = art.replace('>', '')
-    # Replace accent
+    # Remplace les accents par la même lettre sans l'accent
     art = art.replace('é', 'e')
     art = art.replace('è', 'e')
     art = art.replace('à', 'a')
     art = art.replace('ç', 'c')
     art = art.replace('œ', 'oe')
-    # Replace apostrophes by blanks
+    # Remplace les apostrophes par des blancs
     art = re.sub(r'’', ' ', art)
     art = art.replace('\n', '')
     art = art.replace('\r', '')
-    # Get previous letter
     prev_apostrophe = re.findall('([A-Za-z])\'', art)
     for letter in prev_apostrophe:
         art = re.sub(letter + '\'', letter + ' ', art)
         continue
-    # Remove symbols and characters other than letters and digits(accents stay)
-    # noinspection Annotator
+    # Supprimer les symboles et les caractères autres que les lettres et les
+    #chiffres (les accents restent)
     art = re.sub(r'[^\w\s\._]', '', art, re.UNICODE)
-    # Remove blanks at the beginning or the end.
+    # Enlever les blancs au début ou à la fin
     art = re.sub('^ +', '', art)
     art = re.sub(' +$', '', art)
-    # Replace several consecutive blanks by just one blank.
+    # Remplacez plusieurs espaces vides consécutifs par un seul espace.
     art = re.sub(' +', ' ', art)
-    # Out: text content without unnecessary characters
+    # En sortie : contenu textuel sans caractères inutiles.
     return art
 
 
 def text_modif(content):
     import re
 
-    # use regular expression to transform few ' in _
+    # utiliser une expression régulière pour transformer quelques ' dans _
     regex = re.compile(r"(?=(.))(?:[Aa]ujourd['’]hui)", flags=re.IGNORECASE)
     content = regex.sub(r"\1ujourd_hui", content)
 
@@ -103,57 +102,16 @@ def text_modif(content):
     regex = re.compile(r"(?=(.))(?:[Mm]ain-d'oeuvre)", flags=re.IGNORECASE)
     content = regex.sub(r"\1ain-d_oeuvre", content)
 
-    # use regular expression to transform date with .-/ in date with _
-    reg_exp_one = re.compile(r'\d{4}[-/.]\d{2}[-/.]\d{2}')
-    matches_list = reg_exp_one.findall(content)
-    for matche in matches_list:
-        content = re.sub(
-            matche,
-            matche.replace(
-                '/',
-                '_').replace(
-                '-',
-                '_').replace(
-                '.',
-                '_'),
-            content)
-
-    reg_exp_two = re.compile(r'\d{2}[-/.]\d{2}[-/.]\d{4}')
-    matches_list = reg_exp_two.findall(content)
-    for matche in matches_list:
-        content = re.sub(
-            matche,
-            matche.replace(
-                '/',
-                '_').replace(
-                '-',
-                '_').replace(
-                '.',
-                '_'),
-            content)
-
-    reg_exp_three = re.compile(r'\d{2}[-/.]\d{2}[-/.]\d{2}')
-    matches_list = reg_exp_three.findall(content)
-    for matche in matches_list:
-        content = re.sub(
-            matche,
-            matche.replace(
-                '/',
-                '_').replace(
-                '-',
-                '_').replace(
-                '.',
-                '_'),
-            content)
-
-    # use regular expression to transform fraction with / in fraction with _
+    # utilise l'expression régulière pour transformer la fraction avec /
+    # en fraction avec _
     reg_exp_four = re.compile(r'[0-9]+[/][0-9]+')
     matches_list = reg_exp_four.findall(content)
     for matche in matches_list:
         content = re.sub(matche, matche.replace('/', '_'), content)
 
-    # use regular expression to transform date with space in date with _
-    # list days and months
+    # utilise l'expression régulière pour transformer la date avec l'espace
+    # en date avec _
+    # liste jour et mois
     days = ['[Ll]undi', '[mM]ardi', '[mM]ercredi', '[Jj]eudi', '[Vv]endredi',
             '[Ss]amedi', '[Dd]imanche']
     months = ['[Jj]anvier', '[Ff][eé]vrier', '[mM]ars', '[Aa]vril', '[mM]ai',
@@ -215,7 +173,8 @@ def text_modif(content):
                 ''.join(matche),
                 content)
 
-    # use regular expression to transform number with space/. in number with _
+    # utilise l'expression régulière pour transformer le nombre avec espace /.
+    # en nombre avec _
     reg_exp_six = re.compile(
             r'[0-9]+[., ][0-9]{3}[., ][0-9]{3}[., ][0-9]{3}[., ][0-9]{3}[., ][0-9]{1,3}')
     matches_list = reg_exp_six.findall(content)
@@ -294,7 +253,7 @@ def text_modif(content):
                 '_'),
             content)
     try:
-        # use regular expression to transform deg in space
+        # utiliser l'expression régulière pour transformer deg dans l'espace
         reg_exp_eleven = re.compile(r'[a-zA-ÿ]+[deg][0-9]')
         matches_list = reg_exp_eleven.findall(content)
 
@@ -328,15 +287,15 @@ def tokeniz(text):
 # Entites nommes
 def handing_entity(tokenize_text):
     """
-        Summary:
-            we go through a tokenize text (result of the function "tokenize"),
-            to find named entity in the text.
-        In:
-            - tokenize text, result of function "tokeniz()"
-        Out:
-            - list of named entity, and the same list, but whitespaces
-            are replace by _, in order to recognize one entity, as one token in
-            the lemmatisation
+    Résumé :
+        nous passons par un texte tokenize (résultat de la fonction "tokenize"),
+        pour trouver l'entité nommée dans le texte.
+    Entrée :
+        - tokenize texte, résultat de la fonction "tokeniz ()"
+    Sortie :
+        - liste de l'entité nommée, et la même liste, mais les espaces sont
+        remplacés par _, afin de reconnaître une entité, comme un jeton dans
+        la lemmatisation
     """
     ent = {}
     ent_und = {}
@@ -348,17 +307,17 @@ def handing_entity(tokenize_text):
 
 def analys_token(article, text_token, entity_,newspapers,identi_article,date_p):
     """
-        Résumé :
-            cette fonction permet de créer un dictionnaire regroupant l'id de
-            l'article, le nom du journal, le mot, le mot lemmatise, le pos_tag
-            du mot, sa position et sa date de publication.
-        En entrée :
-            - l'article
-            - text_token : liste de mot tokenise
-            - entity : liste de entités nommées
-        En sortie :
-            cette fonction renvoie les informations décrites dans le résumé.
-    """
+    Résumé :
+        cette fonction permet de créer un dictionnaire regroupant l'id de
+        l'article, le nom du journal, le mot, le mot lemmatise, le pos_tag
+        du mot, sa position et sa date de publication.
+    En entrée :
+        - l'article
+        - text_token : liste de mot tokenise
+        - entity : liste de entités nommées
+    En sortie :
+        cette fonction renvoie les informations décrites dans le résumé.
+"""
 
     info_token = {}
     i = 1
@@ -390,35 +349,34 @@ def analys_token(article, text_token, entity_,newspapers,identi_article,date_p):
 
 def tag_text(article, k):
     """
-        Summary:
-        In:
-            - article: content of the article
-            - f_stopwords: boolean used with parameter "with_stopwords"
-            from analys_token
-        Out:
-            2 results (see analys_tokens)
-            if is_title = True:
-                - a dict with a list of all the words in the title processed
-                and without stopwords
-           if is_title = False:
-               - a list of all the words striped of stopwords
-               - a list of all the words
-               both with stems and pos-tags and a flag if the word is
-               named entity
+    En entrée :
+        - article: contenu de l'article
+        - f_stopwords: booléen utilisé avec le paramètre "with_stopwords"
+        à partir de analys_token
+    Sortie :
+        2 résultats (voir analys_tokens)
+        if is_title = Vrai:
+            - un dict avec une liste de tous les mots dans le titre traité
+            et sans mots d'ordre
+        if is_title = Faux:
+           - une liste de tous les mots rayés des mots d'ordre
+           - une liste de tous les mots
+           à la fois avec des tiges et pos-tags et un drapeau si le mot est
+           entité nommée
     """
     text = [x['content'] for x in article]
     journal = [x['newspaper'] for x in article]
     id_article = k
     date_publication = [x['date_publi'] for x in article]
-    # remove punctuation
+    # supprimer la ponctuation
     clean_text = clean_symbols(str(text))
-    # list of entity and list of entity here " " are replace by "_"
+    # liste des entités et la liste des entités ici "" sont remplacées par "_"
     entity, entity_ = handing_entity(tokeniz(clean_text))
     for keys in entity.keys():
         clean_text = clean_text.replace(keys, keys.replace(" ", "_"))
     tokens = tokeniz(clean_text)
 
-    # idemn le journal etait en list, mis en str
+    # idem le journal etait en list, mis en str
     journal = "".join(journal)
 
     return analys_token(article, tokens, entity_, journal,
